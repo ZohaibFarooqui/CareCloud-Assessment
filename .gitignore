@@ -4,3 +4,6 @@ node_modules/
 .vercel
 .DS_Store
 npm-debug.log*
+
+# The assessment brief is marked confidential - keep it out of the public repo.
+*.pdf

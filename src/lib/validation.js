@@ -37,6 +37,12 @@ const SEX_LABELS = {
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const ZIP_RE = /^\d{5}(-\d{4})?$/;
 
+// The spec asks for alphabetic plus hyphens and apostrophes. Spaces are allowed
+// too, otherwise "Van Der Berg" and "Mary Jane" get rejected, and \p{L} keeps
+// accented names like Muñoz working. Must start with a letter.
+const NAME_RE = /^\p{L}[\p{L}\p{M}'\- ]*$/u;
+const NAME_MAX = 50;
+
 const REQUIRED = [
   'first_name', 'last_name', 'date_of_birth', 'sex', 'phone_number',
   'address_line_1', 'city', 'state', 'zip_code',
@@ -172,8 +178,13 @@ function validatePatient(input, opts) {
     }
 
     if (field === 'first_name' || field === 'last_name') {
-      if (value.length > 100) {
-        errors.push({ field, message: label(field) + ' must be 100 characters or fewer.' });
+      if (value.length > NAME_MAX) {
+        errors.push({ field, message: label(field) + ' must be 50 characters or fewer.' });
+      } else if (!NAME_RE.test(value)) {
+        errors.push({
+          field,
+          message: label(field) + ' may only contain letters, spaces, hyphens and apostrophes.',
+        });
       } else {
         data[FIELD_TO_COLUMN[field]] = value;
       }

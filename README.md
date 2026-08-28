@@ -7,6 +7,24 @@ There's a REST API over the same data and a small dashboard to look at what came
 I had roughly three hours, so the goal was one working path all the way through rather than
 a polished version of any single piece.
 
+## Live demo
+
+| | |
+| --- | --- |
+| **Phone number** | **+1 (504) 738-8188** |
+| **API base URL** | https://care-cloud-assessment.vercel.app |
+| **Dashboard** | https://care-cloud-assessment.vercel.app/dashboard |
+| **Repository** | https://github.com/ZohaibFarooqui/CareCloud-Assessment |
+
+No credentials needed — the API and dashboard are open. The database has two seeded demo
+records (Maria Alvarez, Desmond O'Neill) so there's something to look at before you call.
+
+Quick check that it's up:
+
+```bash
+curl https://care-cloud-assessment.vercel.app/patients
+```
+
 ## What happens on a call
 
 You call the number. Vapi picks up, transcribes you, and runs the conversation through Gemini
@@ -119,6 +137,7 @@ You'll need Node 18+ and a Postgres connection string.
 npm install
 cp .env.example .env      # then fill it in
 npm run db:deploy         # applies prisma/migrations to your database
+npm run db:seed           # optional: two demo records
 npm run dev               # http://localhost:3000
 ```
 
@@ -192,6 +211,11 @@ migration, so a bad row can't get in even through a direct SQL client. Dates of 
 in the future or before 1900, phone numbers must be ten digits with a valid area and exchange
 code, state must be a real two-letter code, ZIP must be five digits or ZIP+4.
 
+Names are capped at 50 characters and restricted to letters plus hyphens and apostrophes. I
+allowed spaces too, because `Van Der Berg` is a real surname, and matched on Unicode letters
+rather than `A-Z` so `Muñoz` and `O'Neill` both pass. The JS regex and the Postgres CHECK were
+written to agree — I tested the same set of names against both.
+
 Inputs get normalized before they're stored. `(415) 555-0132`, `+1 415 555 0132` and
 `415.555.0132` all become `4155550132`, and `tx` becomes `TX`. Dates are stored at UTC midnight
 so a timezone can't shift someone's birthday by a day — that one bites more often than you'd
@@ -212,6 +236,14 @@ configured but unverified end to end.
 
 The rest:
 
+- **A dropped call loses the whole record.** Nothing is written until the caller confirms the
+  read-back, so if the line dies at minute four there's no partial row to recover. That's a
+  deliberate trade — writing partials would mean half-filled records failing NOT NULL, plus a
+  resume path I didn't have time for — but it is the sharpest edge in the system. The fix is a
+  separate `call_sessions` table holding in-progress state keyed by call id, so a caller who
+  rings back picks up where they left off. Vapi does post an `end-of-call-report` to
+  `/vapi/tool` when a call ends for any reason, and that's logged, so an abandoned call is at
+  least visible in the function logs.
 - No auth on anything. The API and dashboard are wide open, and the Vapi webhook doesn't verify
   a shared secret. Deliberate — the FAQ says no production hardening — but it's the first thing
   that would have to change.
