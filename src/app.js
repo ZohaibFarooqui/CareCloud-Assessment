@@ -112,7 +112,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   if (err && err.code === 'P2025') {
     return fail(res, 404, 'Patient not found.');
   }
-  // A CHECK constraint rejected the row -- validation should have caught it first.
+  // A CHECK constraint rejected the row. Validation should have caught it first.
   if (err && (err.code === 'P2010' || err.code === 'P2000' || err.code === 'P2003')) {
     return fail(res, 422, 'The database rejected this record.', [
       { field: 'unknown', message: err.message },

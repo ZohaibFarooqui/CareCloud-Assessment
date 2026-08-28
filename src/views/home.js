@@ -1,5 +1,5 @@
-// Overview page. Everything numeric on it is queried live -- nothing is hardcoded,
-// so it can't drift away from what the database actually contains.
+// Overview page. Every number on it is queried live rather than hardcoded, so the page
+// cannot drift away from what the database actually holds.
 
 const { escapeHtml, formatPhone, formatTimestamp, page, AUTHOR } = require('./shared');
 
@@ -17,7 +17,7 @@ const ENDPOINTS = [
 
 const STACK = [
   ['Telephony, STT, TTS', 'Vapi', 'Handles the phone number, transcription, voice and turn-taking. Building STT/TTS by hand was out of scope.'],
-  ['LLM', 'Gemini 2.5 Flash', 'Native Vapi provider, free tier, and fast — latency between turns is what makes an agent feel robotic.'],
+  ['LLM', 'Gemini 2.5 Flash', 'Native Vapi provider, free tier, and fast. Latency between turns is what makes an agent feel robotic.'],
   ['API', 'Node + Express 5', 'One app, one serverless function, routing stays in Express.'],
   ['Database', 'Postgres (Neon)', 'Vercel functions have no disk, so SQLite would not survive a restart.'],
   ['ORM', 'Prisma', 'Migrations, and the schema doubles as documentation.'],
@@ -68,7 +68,7 @@ function renderHome({ patientCount = 0, latest = null, baseUrl = '', dbOk = true
 
   <h2>Right now</h2>
   <div class="grid">
-    ${dbOk ? statCard(patientCount, 'Patients on file') : statCard('—', 'Database unreachable')}
+    ${dbOk ? statCard(patientCount, 'Patients on file') : statCard('n/a', 'Database unreachable')}
     ${statCard(latest ? formatTimestamp(latest) : 'None yet', 'Most recent registration')}
     ${statCard('Live', 'Agent status')}
   </div>
@@ -88,13 +88,13 @@ function renderHome({ patientCount = 0, latest = null, baseUrl = '', dbOk = true
   <p class="lede" style="margin-top:1rem">
     The agent never writes to the database itself. It calls a tool, which is an HTTP request to
     <code>/vapi/tool</code>, and that handler goes through the same service module as
-    <code>POST /patients</code> — so the voice path and the API path cannot drift apart.
+    <code>POST /patients</code>, so the voice path and the API path cannot drift apart.
   </p>
 
   <h2>What the agent handles</h2>
   <ul class="plain">
-    <li>Multi-field answers in one breath — <em>"I'm Jane Davis, born March third nineteen ninety."</em></li>
-    <li>Mid-call corrections without restarting — <em>"actually it's D-A-V-I-S, not D-A-V-I-E-S."</em></li>
+    <li>Several answers in one breath, like <em>"I'm Jane Davis, born March third nineteen ninety."</em></li>
+    <li>Corrections partway through, like <em>"actually it's D-A-V-I-S, not D-A-V-I-E-S."</em>, without starting over.</li>
     <li>Re-prompting for only the field that failed, never the whole form.</li>
     <li>Reading the full record back and waiting for confirmation before it saves anything.</li>
     <li>Recognising a returning caller by phone number and offering to update instead of duplicate.</li>
@@ -119,7 +119,7 @@ function renderHome({ patientCount = 0, latest = null, baseUrl = '', dbOk = true
 
   <footer>
     Built as a take-home technical assessment for CareCloud. Seeded with fictional demo
-    records — no real patient data. Full write-up, trade-offs and known limitations are in
+    records, so no real patient data. The full write up, trade offs and known limitations are in
     the <a href="${AUTHOR.repo}" target="_blank" rel="noopener noreferrer">README</a>.
   </footer>`;
 

@@ -1,5 +1,5 @@
-// Shared chrome for the server-rendered pages. No framework, no CDN, no build
-// step -- the whole front end is string templates and one stylesheet.
+// Shared chrome for the server rendered pages. No framework, no CDN and no build step.
+// The whole front end is string templates plus one stylesheet.
 
 const AUTHOR = {
   name: 'Muhammad Zohaib Farooqui',

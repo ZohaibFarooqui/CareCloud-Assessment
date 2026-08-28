@@ -31,7 +31,7 @@ if (!PUBLIC_BASE_URL) die('PUBLIC_BASE_URL is not set. Add your deployed URL to 
 
 const baseUrl = PUBLIC_BASE_URL.replace(/\/+$/, '');
 if (!/^https:\/\//.test(baseUrl)) {
-  die('PUBLIC_BASE_URL must be an https URL that Vapi can reach. localhost will not work -- deploy first, or use a tunnel.');
+  die('PUBLIC_BASE_URL must be an https URL that Vapi can reach. localhost will not work, so deploy first or use a tunnel.');
 }
 
 const systemPrompt = fs.readFileSync(path.join(__dirname, 'system-prompt.md'), 'utf8');
@@ -67,8 +67,8 @@ const assistant = {
   },
 
   firstMessage:
-    "Thanks for calling Lakeside Family Medicine, this is Riley. I can get you registered as a new patient " +
-    "-- it only takes a few minutes. Could I start with a good callback number for you?",
+    "Thanks for calling Lakeside Family Medicine, this is Riley. I can get you registered as a new " +
+    "patient, it only takes a few minutes. Could I start with a good callback number for you?",
 
   // Where non-tool events (including end-of-call-report) are delivered.
   server: { url: baseUrl + '/vapi/tool' },

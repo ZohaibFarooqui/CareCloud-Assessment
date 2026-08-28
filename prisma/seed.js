@@ -1,6 +1,6 @@
-// Two demonstration records so the dashboard and the API aren't empty on a
-// fresh database. Both are obviously fictional -- the brief says not to store
-// real patient data, and 555 numbers are reserved for exactly this.
+// Two demonstration records so the dashboard and API aren't empty on a fresh database.
+// Both are obviously fictional. The brief says not to store real patient data, and 555
+// numbers are reserved for exactly this kind of thing.
 //
 //   npm run db:seed
 //

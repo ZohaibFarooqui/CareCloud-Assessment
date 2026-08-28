@@ -108,7 +108,7 @@ async function updatePatient(id, body) {
   return serializePatient(row);
 }
 
-// Soft delete only -- rows are never removed from the table.
+// Soft delete only. Rows are never removed from the table.
 async function deletePatient(id) {
   assertUuid(id);
   const existing = await prisma.patient.findFirst({ where: { patientId: id, ...NOT_DELETED } });

@@ -1,6 +1,6 @@
-// Hand-rolled validation. The voice agent does a first pass over the caller's
-// answers, but we never trust it -- everything that reaches the API is
-// re-checked here, and the DB has CHECK constraints behind that.
+// Hand written validation. The voice agent does a first pass over the caller's answers
+// but we never trust it. Everything reaching the API is checked again here, and the
+// database has CHECK constraints sitting behind that.
 //
 // Every failure is reported as { field, message } so a caller (including the
 // Vapi tool handler) can re-prompt for exactly one field instead of restarting.
@@ -151,7 +151,7 @@ const MAX_LENGTHS = {
 /**
  * @param {object} input raw request body (snake_case field names)
  * @param {object} [opts]
- * @param {boolean} [opts.partial] true for PUT -- only validate keys present
+ * @param {boolean} [opts.partial] true for PUT, so only keys present are validated
  * @returns {{ data?: object, errors: Array<{field: string, message: string}> }}
  */
 function validatePatient(input, opts) {
@@ -167,7 +167,7 @@ function validatePatient(input, opts) {
       errors.push({ field: key, message: 'Unknown field "' + key + '".' });
     });
 
-  // ---- required fields ----
+  // Required fields.
   for (const field of REQUIRED) {
     if (partial && !present(field)) continue;
 
@@ -239,7 +239,7 @@ function validatePatient(input, opts) {
     }
   }
 
-  // ---- optional fields ----
+  // Optional fields.
   // An explicit null clears the column; an empty string is treated the same way.
   for (const field of OPTIONAL) {
     if (!present(field)) continue;
