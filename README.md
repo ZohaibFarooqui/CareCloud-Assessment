@@ -13,6 +13,7 @@ a polished version of any single piece.
 | --- | --- |
 | **Phone number** | **+1 (504) 738-8188** |
 | **API base URL** | https://care-cloud-assessment.vercel.app |
+| **Overview page** | https://care-cloud-assessment.vercel.app |
 | **Dashboard** | https://care-cloud-assessment.vercel.app/dashboard |
 | **Repository** | https://github.com/ZohaibFarooqui/CareCloud-Assessment |
 
@@ -64,7 +65,8 @@ The layering is deliberately boring:
 - `src/controllers` — HTTP concerns, status codes, logging
 - `src/services/patients.js` — all reads and writes, throws `ApiError` with a status
 - `src/lib/validation.js` — every field rule, returns `{field, message}` pairs
-- `src/views/dashboard.js` — the dashboard, rendered to an HTML string
+- `src/views/` — the pages, rendered to HTML strings (`shared.js` holds the layout and
+  styles, `home.js` the overview, `dashboard.js` the patient list and detail)
 
 The reason validation returns field-level errors rather than one message is that the voice
 agent needs to know *which* field to re-ask for. If a caller's date of birth doesn't parse,
@@ -95,9 +97,11 @@ works — it's all the same `DATABASE_URL`.
 of the data model. The generated client also gives type-safe field names, which caught a couple
 of my own typos.
 
-**No frontend framework for the dashboard.** It's server-rendered from a template string. One
-round trip, no build step, no client state, and nothing for Vercel's static asset handling to
-get wrong. It's plain, and that's intentional.
+**No frontend framework.** All three pages — the overview, the patient list and the detail
+view — are server-rendered from template strings, with one stylesheet inlined into the layout.
+One round trip, no build step, no client state, and nothing for Vercel's static asset handling
+to get wrong. The counts on the overview page are queried per request rather than baked in, so
+the page can't claim something the database doesn't actually contain.
 
 **No validation library.** I hand-rolled `src/lib/validation.js`. Zod would have been fewer
 lines, but I wanted exact control over the error text since those messages drive what the voice
@@ -194,7 +198,9 @@ validation failures.
 | `POST` | `/patients` | 201 with the created record |
 | `PUT` | `/patients/:id` | Partial update. `PATCH` works too |
 | `DELETE` | `/patients/:id` | Soft delete — sets `deleted_at`, row stays in the table |
+| `GET` | `/` | HTML overview page |
 | `GET` | `/dashboard` | HTML. `?q=` searches last name, or phone if the input is ten digits |
+| `GET` | `/dashboard/:id` | HTML detail view for one patient |
 | `POST` | `/vapi/tool` | Vapi webhook |
 | `GET` | `/health` | Liveness |
 
@@ -247,7 +253,9 @@ The rest:
 - No auth on anything. The API and dashboard are wide open, and the Vapi webhook doesn't verify
   a shared secret. Deliberate — the FAQ says no production hardening — but it's the first thing
   that would have to change.
-- The dashboard is read-only and unpaginated, capped at 100 rows.
+- The dashboard is read-only and unpaginated, capped at 100 rows. There is a detail view per
+  patient, but no way to edit a record from the browser — corrections go through `PUT` or a
+  second call to the agent.
 - The duplicate check matches on phone number alone, so a family sharing a landline looks like
   one returning patient.
 - `migration.sql` is hand-written rather than generated, because I had no database to run
@@ -267,8 +275,8 @@ alongside the record so a human can audit what the agent actually heard. Right n
 mis-transcribed street name is invisible after the call ends.
 
 The duplicate check should really match on phone plus date of birth rather than phone alone.
-And the dashboard needs pagination and a detail view before anyone could use it for real —
-listing is fine, but you can't see the optional fields anywhere.
+The dashboard needs pagination once there are more than a hundred records, and editing from
+the browser would save a phone call when someone spots a typo.
 
 Things I skipped on purpose as out of scope: appointment scheduling, multi-language support
 (the field is captured, nothing reads it), and any kind of HIPAA or encryption work.

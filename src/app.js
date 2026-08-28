@@ -3,7 +3,9 @@ const express = require('express');
 const patientsRouter = require('./routes/patients');
 const vapiRouter = require('./routes/vapi');
 const patientsService = require('./services/patients');
-const { renderDashboard } = require('./views/dashboard');
+const { renderDashboard, renderPatient, renderNotFound } = require('./views/dashboard');
+const { renderHome } = require('./views/home');
+const { prisma } = require('./lib/prisma');
 const { ok, fail, ApiError, asyncHandler } = require('./lib/response');
 const { normalizePhone } = require('./lib/validation');
 
@@ -13,10 +15,32 @@ app.disable('x-powered-by');
 app.set('trust proxy', true);
 app.use(express.json({ limit: '256kb' }));
 
-app.get('/', (req, res) =>
-  ok(res, {
-    service: 'carecloud-patient-intake',
-    endpoints: ['/patients', '/patients/:id', '/dashboard', '/vapi/tool', '/health'],
+// Overview page. The counts are read live rather than hardcoded, and a database
+// outage degrades the numbers instead of taking the page down.
+app.get(
+  '/',
+  asyncHandler(async (req, res) => {
+    let patientCount = 0;
+    let latest = null;
+    let dbOk = true;
+
+    try {
+      patientCount = await prisma.patient.count({ where: { deletedAt: null } });
+      const newest = await prisma.patient.findFirst({
+        where: { deletedAt: null },
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true },
+      });
+      latest = newest ? newest.createdAt.toISOString() : null;
+    } catch (err) {
+      console.error('[home]', err);
+      dbOk = false;
+    }
+
+    return res
+      .status(200)
+      .type('html')
+      .send(renderHome({ patientCount, latest, dbOk }));
   })
 );
 
@@ -50,6 +74,21 @@ app.get(
           : 'Could not load patients. Check that DATABASE_URL is set and migrations have run.';
       if (!(err instanceof ApiError)) console.error('[dashboard]', err);
       return res.status(200).type('html').send(renderDashboard({ patients: [], q, error: message }));
+    }
+  })
+);
+
+app.get(
+  '/dashboard/:id',
+  asyncHandler(async (req, res) => {
+    try {
+      const patient = await patientsService.getPatient(req.params.id);
+      return res.status(200).type('html').send(renderPatient(patient));
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 404 || err.status === 400)) {
+        return res.status(err.status).type('html').send(renderNotFound(err.message));
+      }
+      throw err;
     }
   })
 );
