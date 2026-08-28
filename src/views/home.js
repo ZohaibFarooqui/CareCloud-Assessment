@@ -1,7 +1,7 @@
 // Overview page. Everything numeric on it is queried live -- nothing is hardcoded,
 // so it can't drift away from what the database actually contains.
 
-const { escapeHtml, formatPhone, formatTimestamp, page } = require('./shared');
+const { escapeHtml, formatPhone, formatTimestamp, page, AUTHOR } = require('./shared');
 
 const PHONE = '+15047388188';
 
@@ -118,9 +118,9 @@ function renderHome({ patientCount = 0, latest = null, baseUrl = '', dbOk = true
   </table></div>
 
   <footer>
-    Assessment build. Seeded with fictional demo records — no real patient data.
-    Full write-up, trade-offs and known limitations are in the
-    <a href="https://github.com/ZohaibFarooqui/CareCloud-Assessment" rel="noopener">README</a>.
+    Built as a take-home technical assessment for CareCloud. Seeded with fictional demo
+    records — no real patient data. Full write-up, trade-offs and known limitations are in
+    the <a href="${AUTHOR.repo}" target="_blank" rel="noopener noreferrer">README</a>.
   </footer>`;
 
   return page({ title: 'Voice Patient Registration', body, active: 'Overview' });

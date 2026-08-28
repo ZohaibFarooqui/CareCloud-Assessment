@@ -16,6 +16,7 @@ a polished version of any single piece.
 | **Overview page** | https://care-cloud-assessment.vercel.app |
 | **Dashboard** | https://care-cloud-assessment.vercel.app/dashboard |
 | **Repository** | https://github.com/ZohaibFarooqui/CareCloud-Assessment |
+| **Built by** | Muhammad Zohaib Farooqui — [LinkedIn](https://www.linkedin.com/in/zohaib-farooqui-75613a231/) · [GitHub](https://github.com/ZohaibFarooqui) |
 
 No credentials needed — the API and dashboard are open. The database has two seeded demo
 records (Maria Alvarez, Desmond O'Neill) so there's something to look at before you call.
@@ -280,3 +281,9 @@ the browser would save a phone call when someone spots a typo.
 
 Things I skipped on purpose as out of scope: appointment scheduling, multi-language support
 (the field is captured, nothing reads it), and any kind of HIPAA or encryption work.
+
+---
+
+Built by Muhammad Zohaib Farooqui as a take-home technical assessment for CareCloud.
+[LinkedIn](https://www.linkedin.com/in/zohaib-farooqui-75613a231/) ·
+[GitHub](https://github.com/ZohaibFarooqui)

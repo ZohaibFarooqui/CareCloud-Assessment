@@ -1,6 +1,13 @@
 // Shared chrome for the server-rendered pages. No framework, no CDN, no build
 // step -- the whole front end is string templates and one stylesheet.
 
+const AUTHOR = {
+  name: 'Muhammad Zohaib Farooqui',
+  linkedin: 'https://www.linkedin.com/in/zohaib-farooqui-75613a231/',
+  github: 'https://github.com/ZohaibFarooqui',
+  repo: 'https://github.com/ZohaibFarooqui/CareCloud-Assessment',
+};
+
 const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
 const escapeHtml = (v) =>
@@ -135,6 +142,17 @@ const STYLES = `
   }
   .count { color: var(--muted); font-size: .85rem; margin: 0 0 .6rem; }
   footer { margin-top: 3rem; color: var(--muted); font-size: .82rem; }
+
+  .site-footer { border-top: 1px solid var(--line); margin-top: 3.5rem; background: var(--panel); }
+  .site-footer .inner {
+    max-width: 940px; margin: 0 auto; padding: 1.4rem 1.25rem 2rem;
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: .75rem 1.5rem; flex-wrap: wrap; font-size: .84rem; color: var(--muted);
+  }
+  .site-footer .by { color: var(--ink); font-weight: 600; }
+  .site-footer a { color: var(--muted); text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+  .site-footer .sep { opacity: .45; margin: 0 .45rem; }
   ul.plain { padding-left: 1.1rem; }
   ul.plain li { margin: .3rem 0; }
   @media (max-width: 560px) {
@@ -154,6 +172,8 @@ function page({ title, body, active }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
+<meta name="author" content="${escapeHtml(AUTHOR.name)}">
+<meta name="description" content="Voice AI patient registration agent. Take-home technical assessment for CareCloud by ${escapeHtml(AUTHOR.name)}.">
 <style>${STYLES}</style>
 </head>
 <body>
@@ -161,13 +181,28 @@ function page({ title, body, active }) {
   <a class="brand" href="/">Voice Patient Intake</a>
   ${nav('/', 'Overview')}
   ${nav('/dashboard', 'Patients')}
-  <a class="link" href="https://github.com/ZohaibFarooqui/CareCloud-Assessment" rel="noopener">Source</a>
+  <a class="link" href="${AUTHOR.repo}" target="_blank" rel="noopener noreferrer">Source</a>
 </div></nav>
 <main>
 ${body}
 </main>
+${siteFooter()}
 </body>
 </html>`;
 }
 
-module.exports = { escapeHtml, formatPhone, formatDate, formatTimestamp, page };
+// Attribution, shown on every page.
+function siteFooter() {
+  return `<footer class="site-footer"><div class="inner">
+  <div>
+    Made by <span class="by">Muhammad Zohaib Farooqui</span>
+    <span class="sep">&middot;</span>
+    <a href="${AUTHOR.linkedin}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    <span class="sep">&middot;</span>
+    <a href="${AUTHOR.github}" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+  <div>Take-home technical assessment for CareCloud &middot; demo data only</div>
+</div></footer>`;
+}
+
+module.exports = { escapeHtml, formatPhone, formatDate, formatTimestamp, page, AUTHOR };
