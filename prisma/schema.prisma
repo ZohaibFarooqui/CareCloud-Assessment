@@ -1,0 +1,55 @@
+// Postgres because the app runs on Vercel serverless functions, which have no
+// persistent disk. A SQLite file would be wiped between invocations.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Sex {
+  MALE              @map("Male")
+  FEMALE            @map("Female")
+  OTHER             @map("Other")
+  DECLINE_TO_ANSWER @map("Decline to Answer")
+
+  @@map("sex")
+}
+
+model Patient {
+  patientId String   @id @default(uuid()) @map("patient_id") @db.Uuid
+
+  // Required demographics.
+  firstName    String   @map("first_name") @db.VarChar(100)
+  lastName     String   @map("last_name") @db.VarChar(100)
+  dateOfBirth  DateTime @map("date_of_birth") @db.Date
+  sex          Sex
+  phoneNumber  String   @map("phone_number") @db.Char(10)
+  addressLine1 String   @map("address_line_1") @db.VarChar(200)
+  city         String   @db.VarChar(100)
+  state        String   @db.Char(2)
+  zipCode      String   @map("zip_code") @db.VarChar(10)
+
+  // Optional.
+  email                 String? @db.VarChar(254)
+  addressLine2          String? @map("address_line_2") @db.VarChar(200)
+  insuranceProvider     String? @map("insurance_provider") @db.VarChar(150)
+  insuranceMemberId     String? @map("insurance_member_id") @db.VarChar(100)
+  preferredLanguage     String  @default("English") @map("preferred_language") @db.VarChar(60)
+  emergencyContactName  String? @map("emergency_contact_name") @db.VarChar(200)
+  emergencyContactPhone String? @map("emergency_contact_phone") @db.Char(10)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@index([lastName])
+  @@index([phoneNumber])
+  @@index([dateOfBirth])
+  @@index([deletedAt])
+  @@map("patients")
+}

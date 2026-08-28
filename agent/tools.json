@@ -1,0 +1,98 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "lookup_patient_by_phone",
+      "description": "Check whether a patient already exists with this phone number. Call this as soon as you have the caller's ten-digit phone number, before collecting anything else. If it returns found, offer to update the existing record instead of creating a new one.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "description": "Ten digits, no punctuation or country code. Example: 4155550132"
+          }
+        },
+        "required": ["phone_number"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "save_patient",
+      "description": "Create a new patient record. Call this only after the caller has confirmed the read-back of their details. If the result says invalid, re-ask the caller for only the fields listed in invalid_fields, then call this again.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "first_name": { "type": "string", "description": "Given name." },
+          "last_name": { "type": "string", "description": "Family name, spelled back to the caller for confirmation." },
+          "date_of_birth": {
+            "type": "string",
+            "description": "YYYY-MM-DD. Convert what the caller said, e.g. 'March third nineteen ninety' becomes 1990-03-03. Cannot be in the future."
+          },
+          "sex": {
+            "type": "string",
+            "enum": ["Male", "Female", "Other", "Decline to Answer"],
+            "description": "Exactly one of the four values. Always ask, never infer."
+          },
+          "phone_number": { "type": "string", "description": "Ten digits, no punctuation. Example: 4155550132" },
+          "address_line_1": { "type": "string", "description": "Street number and name." },
+          "address_line_2": { "type": "string", "description": "Apartment, suite, or unit. Omit if not given." },
+          "city": { "type": "string" },
+          "state": { "type": "string", "description": "Two-letter US state code, uppercase. Example: TX" },
+          "zip_code": { "type": "string", "description": "Five digits, or ZIP+4 as 12345-6789." },
+          "email": { "type": "string", "description": "Optional. Omit if not given." },
+          "insurance_provider": { "type": "string", "description": "Optional." },
+          "insurance_member_id": { "type": "string", "description": "Optional." },
+          "preferred_language": { "type": "string", "description": "Optional. Defaults to English if omitted." },
+          "emergency_contact_name": { "type": "string", "description": "Optional." },
+          "emergency_contact_phone": { "type": "string", "description": "Optional. Ten digits, no punctuation." }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "date_of_birth",
+          "sex",
+          "phone_number",
+          "address_line_1",
+          "city",
+          "state",
+          "zip_code"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "update_patient",
+      "description": "Update an existing patient record. Use this when lookup_patient_by_phone found a match and the caller agreed to update. Send patient_id plus only the fields that are changing.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "description": "The patient_id returned by lookup_patient_by_phone."
+          },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "date_of_birth": { "type": "string", "description": "YYYY-MM-DD." },
+          "sex": { "type": "string", "enum": ["Male", "Female", "Other", "Decline to Answer"] },
+          "phone_number": { "type": "string", "description": "Ten digits, no punctuation." },
+          "address_line_1": { "type": "string" },
+          "address_line_2": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string", "description": "Two-letter US state code." },
+          "zip_code": { "type": "string" },
+          "email": { "type": "string" },
+          "insurance_provider": { "type": "string" },
+          "insurance_member_id": { "type": "string" },
+          "preferred_language": { "type": "string" },
+          "emergency_contact_name": { "type": "string" },
+          "emergency_contact_phone": { "type": "string" }
+        },
+        "required": ["patient_id"]
+      }
+    }
+  }
+]

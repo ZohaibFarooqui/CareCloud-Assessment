@@ -1,0 +1,28 @@
+{
+  "name": "carecloud-patient-intake",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Voice AI patient registration: Vapi + Gemini phone agent, Express REST API, Postgres via Prisma.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "vercel-build": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "agent:deploy": "node agent/create-assistant.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "dotenv": "^16.4.7",
+    "express": "^5.0.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.2.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
